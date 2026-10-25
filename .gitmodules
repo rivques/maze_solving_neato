@@ -1,0 +1,3 @@
+[submodule "src/neato_packages"]
+	path = src/neato_packages
+	url = https://github.com/comprobo26/neato_packages.git

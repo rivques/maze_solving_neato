@@ -755,6 +755,7 @@ environments:
       - conda: https://prefix.dev/robostack-jazzy/linux-64/ros2-keyboard-handler-0.3.2-np2py314h53a0733_27.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-64/ros2-laser-geometry-2.7.2-np2py314habcfd04_27.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-64/ros2-launch-3.4.12-np2py314h53a0733_27.conda
+      - conda: https://prefix.dev/robostack-jazzy/linux-64/ros2-launch-pytest-3.4.12-np2py314h53a0733_27.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-64/ros2-launch-ros-0.26.13-np2py314h53a0733_27.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-64/ros2-launch-testing-3.4.12-np2py314h53a0733_27.conda
       - conda: https://prefix.dev/robostack-jazzy/linux-64/ros2-launch-testing-ament-cmake-3.4.12-np2py314h53a0733_27.conda
@@ -13757,6 +13758,28 @@ packages:
   run_exports: {}
   size: 252335
   timestamp: 1792669356616
+- conda: https://prefix.dev/robostack-jazzy/linux-64/ros2-launch-pytest-3.4.12-np2py314h53a0733_27.conda
+  sha256: 59ecd66cbe8e65de2e755593ee7d12eae97429c78d5a9cf398be5759cdd7615b
+  md5: 64e3c3bd520f84e7dfeca0e73b9cb3f0
+  depends:
+  - pytest
+  - python
+  - ros2-ament-index-python
+  - ros2-distro-mutex 0.20.* jazzy_*
+  - ros2-launch
+  - ros2-launch-testing
+  - ros2-osrf-pycommon
+  - ros2-ros-workspace
+  - __glibc >=2.28,<3.0.a0
+  - libstdcxx >=15
+  - libgcc >=15
+  - numpy >=1.25,<3
+  - ros2-distro-mutex >=0.20.0,<0.21.0a0
+  - python_abi 3.14.* *_cp314
+  license: Apache-2.0
+  run_exports: {}
+  size: 48047
+  timestamp: 1792670802235
 - conda: https://prefix.dev/robostack-jazzy/linux-64/ros2-launch-ros-0.26.13-np2py314h53a0733_27.conda
   sha256: eb51a414fabe6b31b568da8ad95a301f6adce1fbe919665fa15ee67d31c534c2
   md5: 579668ec8ffd721eaa809c4e08f2359a

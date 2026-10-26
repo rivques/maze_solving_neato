@@ -14,7 +14,7 @@ ros-clean = "rm -r build install log"
 # e.g.: pixi run maze_solver          (runs maze_runner)
 #        pixi run maze_solver other_node
 maze_solver = { cmd = "ros2 run maze_solver {{node}}", "args" = [{"arg"= "node", "default"= "maze_runner"}] }
-test = "colcon test --packages-select maze_solver && colcon test-result --verbose"
+test = "pytest -v --tb=short src/maze_solver"
 gazebo-empty = "ros2 launch neato2_gazebo empty_world.py"
 gazebo-gauntlet = "ros2 launch neato2_gazebo neato_gauntlet_world.py"
 # Connect to a physical Neato: pixi run connect-neato 192.168.XXX.XXX
@@ -41,6 +41,7 @@ compilers = ">=2.0.0,<3"
 pkg-config = ">=0.29.2,<0.30"
 cmake = "<4"
 ninja = ">=1.13.2,<2"
+ros2-launch-pytest = ">=3.4.12,<4"
 
 [activation]
 scripts = ["install/setup.bash"]

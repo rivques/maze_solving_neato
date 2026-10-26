@@ -14,7 +14,7 @@ class MazeRunnerNode(Node):
         while not self.map_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info("Wating for map server to become available...")
 
-        response: GetMap_Response = self.map_client.call(GetMap.Request()) # type: ignore # the generic here doesn't work properly
+        response: GetMap_Response = self.map_client.call(GetMap.Request()) # pyright: ignore[reportAssignmentType] # the generic here doesn't work properly
         self.map: OccupancyGrid = response.map
 
         self.initial_pose: Pose | None = None
@@ -46,7 +46,7 @@ class MazeRunnerNode(Node):
             self.plan_trajectory()
 
     def plan_trajectory(self):
-        self.planned_trajectory = runner_logic.plan_trajectory(self.map, self.initial_pose, self.goal_pose)
+        self.planned_trajectory = runner_logic.plan_trajectory(self.map, self.initial_pose, self.goal_pose) # pyright: ignore[reportArgumentType]
         self.path_follow_timer.reset() # start navigation
 
     def run_loop(self):

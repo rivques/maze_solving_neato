@@ -70,7 +70,7 @@ pixi add numpy          # conda-forge package
 pixi add ros-jazzy-tf2  # robostack ROS package
 ```
 
-This updates `pixi.toml` and `pixi.lock`. If a package isn't available on conda-forge, use  `pixi add --pip <package>` to install from PyPI.
+This updates `pixi.toml` and `pixi.lock`. If a package isn't available on conda-forge, use  `pixi add --pypi <package>` to install from PyPI.
 ### How do I create and run a new node?
 
 1. Create a new Python file in `src/maze_solver/maze_solver/`, e.g. `my_node.py`, with a `main()` function.

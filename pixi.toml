@@ -45,3 +45,6 @@ ros2-launch-pytest = ">=3.4.12,<4"
 
 [activation]
 scripts = ["install/setup.bash"]
+
+[pypi-dependencies]
+pytest-plt = ">=1.1.1, <2"

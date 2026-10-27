@@ -13,3 +13,6 @@ __pycache__/
 
 # VSCode
 .vscode/
+
+# pytest-plt
+plots/

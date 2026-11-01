@@ -48,3 +48,4 @@ scripts = ["install/setup.bash"]
 
 [pypi-dependencies]
 pytest-plt = ">=1.1.1, <2"
+dt-apriltags = ">=3.1.7, <4"

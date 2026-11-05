@@ -47,13 +47,13 @@ class MazeRunnerNode(Node):
         self.planned_path_pub = self.create_publisher(Path, 'planned_path', 10)
         self.executed_path_pub = self.create_publisher(Path, 'executed_path', 10)
         # parameters
-        self.declare_parameter("target_dist_forward", 0.1)
-        self.declare_parameter("linear_kp", 1)
-        self.declare_parameter("angular_kp", 2)
+        self.declare_parameter("target_dist_forward", 0.2)
+        self.declare_parameter("linear_kp", 0.5)
+        self.declare_parameter("angular_kp", 1)
 
     def broadcast_tf(self):
         if self.tf is not None:
-            self.tf.header.stamp = self.get_clock().now().to_msg()
+            self.tf.header.stamp = (self.get_clock().now()).to_msg()
             self.tf_broadcaster.sendTransform(self.tf)
 
     def set_initial_pose(self, msg: PoseWithCovarianceStamped):
@@ -133,12 +133,6 @@ class MazeRunnerNode(Node):
                 break
         else:
             target_index = len(self.planned_trajectory) - 1
-        
-        if target_index == closest_index:
-            self.get_logger().info("Reached the end of the trajectory")
-            self.cmd_vel_pub.publish(Twist()) # stop the robot
-            self.planned_trajectory = []
-            return
 
         target_point = path_points[target_index]
         closest_point = path_points[closest_index]
@@ -152,6 +146,12 @@ class MazeRunnerNode(Node):
         closest_point_msg.point.y = closest_point[1]
         self.target_point_pub.publish(target_point_msg)
         self.closest_point_pub.publish(closest_point_msg)
+        
+        if target_index == closest_index:
+            self.get_logger().info("Reached the end of the trajectory")
+            self.cmd_vel_pub.publish(Twist()) # stop the robot
+            self.planned_trajectory = []
+            return
 
         # take the target point back to odom frame
         target_matrix_map = np.array([[np.cos(theta_init_map), -np.sin(theta_init_map), target_point[0]],

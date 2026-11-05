@@ -11,7 +11,7 @@ def generate_launch_description():
     map_file = DeclareLaunchArgument('map_yaml')
 
     lifecycle_nodes = ['map_server']
-    use_sim_time = DeclareLaunchArgument('use_sim_time', default_value="true")
+    use_sim_time = DeclareLaunchArgument('use_sim_time', default_value="false")
     autostart = True
 
     start_lifecycle_manager = Node(

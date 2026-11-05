@@ -212,8 +212,8 @@ Visualization Manager:
       Position Tolerance: 0.10000000149011612
       Shape:
         Alpha: 1
-        Axes Length: 0.20000000298023224
-        Axes Radius: 0.019999999552965164
+        Axes Length: 0.3499999940395355
+        Axes Radius: 0.029999999329447746
         Color: 255; 25; 0
         Head Length: 0.30000001192092896
         Head Radius: 0.10000000149011612
@@ -302,16 +302,16 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 2.932450532913208
+      Distance: 6.551894664764404
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: 1.4606226682662964
+        Y: 1.4866278171539307
+        Z: 0.45707523822784424
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
@@ -339,4 +339,4 @@ Window Geometry:
     collapsed: false
   Width: 1440
   X: 18
-  Y: 13
+  Y: 0

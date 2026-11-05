@@ -18,7 +18,7 @@ test = "pytest -v --tb=short src/maze_solver"
 gazebo-empty = "ros2 launch neato2_gazebo empty_world.py"
 gazebo-gauntlet = "ros2 launch neato2_gazebo neato_gauntlet_world.py"
 # Connect to a physical Neato: pixi run connect-neato 192.168.XXX.XXX
-connect-neato = { cmd = "ros2 launch neato_node2 bringup.py host:={args}" }
+connect-neato = { cmd = "ros2 launch neato_node2 bringup.py host:={{ip}}", "args" = [{"arg"= "ip"}] }
 teleop = "ros2 run teleop_twist_keyboard teleop_twist_keyboard"
 rviz = "ros2 run rviz2 rviz2"
 rqt = "ros2 run rqt_gui rqt_gui"

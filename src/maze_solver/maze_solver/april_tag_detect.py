@@ -68,7 +68,8 @@ def unwarp_image(path, calibration_path, at_size, x_pixles_out):
 
         A = np.column_stack((np.ones((len(X), 1)), X.T, Y.T))
         # print(A)
-        coeffs, _, _, _ = np.linalg.lstsq(A, Z, rcond=None)
+        coeffs, residuals, _, _ = np.linalg.lstsq(A, Z, rcond=None)
+        print(residuals)
         # print(coeffs)
 
         x_mag = 1 / np.sqrt(1+coeffs[1]**2)
@@ -94,21 +95,21 @@ def unwarp_image(path, calibration_path, at_size, x_pixles_out):
         y_min_c = min(p_on_y)
         y_max_c = max(p_on_y)
 
-        bounds_x_c = np.array([x_min_c, x_min_c, x_max_c, x_max_c, x_min_c]);
-        bounds_y_c = np.array([y_min_c, y_max_c, y_max_c, y_min_c, y_min_c]);
-        bound_points = x_basis[:, np.newaxis]*bounds_x_c+y_basis[:, np.newaxis]*bounds_y_c+np.array([0, 0, coeffs[0]])[:, np.newaxis];
-        x_min = min(bound_points[0, :]);
-        x_max = max(bound_points[0, :]);
-        x_range = x_max - x_min;
-        y_min = min(bound_points[1, :]);
-        y_max = max(bound_points[1, :]);
-        y_range = y_max - y_min;
+        bounds_x_c = np.array([x_min_c, x_min_c, x_max_c, x_max_c, x_min_c])
+        bounds_y_c = np.array([y_min_c, y_max_c, y_max_c, y_min_c, y_min_c])
+        bound_points = x_basis[:, np.newaxis]*bounds_x_c+y_basis[:, np.newaxis]*bounds_y_c+np.array([0, 0, coeffs[0]])[:, np.newaxis]
+        x_range_c = x_max_c - x_min_c
+        x_range = np.linalg.norm(x_basis[:, np.newaxis]*x_range_c)
+        # x_min = min(bound_points[0, :])
+        # y_min = min(bound_points[1, :])
+        y_range_c = y_max_c - y_min_c
+        y_range = np.linalg.norm(y_basis[:, np.newaxis]*y_range_c)
 
         x_pixles = x_pixles_out;
         y_pixles: NDArray = x_pixles * (y_range / x_range);
 
-        x_pix =  ( p_proj_x[0, :] - x_min ) / x_range * x_pixles;
-        y_pix =  ( p_proj_y[1, :] - y_min ) / y_range * y_pixles;
+        x_pix =  ( p_on_x - x_min_c ) / x_range_c * x_pixles;
+        y_pix =  ( p_on_y - y_min_c ) / y_range_c * y_pixles;
 
         src_points = np.array([tag.center for tag in tags])
         dst_points = np.array([

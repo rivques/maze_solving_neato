@@ -4,13 +4,16 @@ from april_tag_detect import unwarp_image
 import math
 from yaml import safe_dump
 
-image_path = "src/maze_solver/tools/maze_photo_test.jpg"
+name = "maze_mac"
+
+image_path = f"src/maze_solver/tools/photo_{name}.jpg"
 calibration_path = "src/maze_solver/tools/calibration_data.npz"
-at_size = 0.12065
+at_size = 0.15875
 
 output = unwarp_image(image_path, calibration_path, at_size, 1000)
 if output is not None:
     image, res, im_size = output 
+    print(res)
 else:
     image = None
     res = None
@@ -19,31 +22,31 @@ else:
 # cv.namedWindow('Maze Photo', cv.WINDOW_NORMAL)
 # cv.resizeWindow('Maze Photo', 1280, 720)
 
-# cv.namedWindow('Masked Image', cv.WINDOW_NORMAL)
-# cv.resizeWindow('Masked Image', 1280, 720)
-# cv.createTrackbar('Hmin', 'Masked Image', 90, 180, lambda i: None)
-# cv.createTrackbar('Smin', 'Masked Image', 110, 255, lambda i: None)
-# cv.createTrackbar('Vmin', 'Masked Image', 116, 255, lambda i: None)
-# cv.createTrackbar('Hmax', 'Masked Image', 116, 180, lambda i: None)
-# cv.createTrackbar('Smax', 'Masked Image', 181, 255, lambda i: None)
-# cv.createTrackbar('Vmax', 'Masked Image', 174, 255, lambda i: None)
+cv.namedWindow('Masked Image', cv.WINDOW_NORMAL)
+cv.resizeWindow('Masked Image', 1280, 720)
+cv.createTrackbar('Hmin', 'Masked Image', 70, 180, lambda i: None)
+cv.createTrackbar('Smin', 'Masked Image', 36, 255, lambda i: None)
+cv.createTrackbar('Vmin', 'Masked Image', 108, 255, lambda i: None)
+cv.createTrackbar('Hmax', 'Masked Image', 114, 180, lambda i: None)
+cv.createTrackbar('Smax', 'Masked Image', 189, 255, lambda i: None)
+cv.createTrackbar('Vmax', 'Masked Image', 166, 255, lambda i: None)
 
-Hmin = 90
-Smin = 110
-Vmin = 116
-Hmax = 116
-Smax = 181
-Vmax = 174
+Hmin = 70
+Smin = 36
+Vmin = 108
+Hmax = 114
+Smax = 189
+Vmax = 166
 
-# cv.namedWindow('White Mask', cv.WINDOW_NORMAL)
-# cv.resizeWindow('White Mask', 1280, 720)
-# cv.createTrackbar('white_thres', 'White Mask', 186, 255, lambda i: None)
+cv.namedWindow('White Mask', cv.WINDOW_NORMAL)
+cv.resizeWindow('White Mask', 1280, 720)
+cv.createTrackbar('white_thres', 'White Mask', 171, 255, lambda i: None)
 
-threshold_min = 186
+threshold_min = 171
 
-# cv.namedWindow('cleaned', cv.WINDOW_NORMAL)
-# cv.resizeWindow('cleaned', 1280, 720)
-# cv.createTrackbar('size', 'cleaned', 9, 10, lambda i: None)
+cv.namedWindow('cleaned', cv.WINDOW_NORMAL)
+cv.resizeWindow('cleaned', 1280, 720)
+cv.createTrackbar('size', 'cleaned', 9, 10, lambda i: None)
 
 size = 9
 
@@ -59,12 +62,12 @@ if image is not None and res is not None:
     while True:
         hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)
 
-        # Hmin = cv.getTrackbarPos('Hmin', 'Masked Image')
-        # Smin = cv.getTrackbarPos('Smin', 'Masked Image')
-        # Vmin = cv.getTrackbarPos('Vmin', 'Masked Image')
-        # Hmax = cv.getTrackbarPos('Hmax', 'Masked Image')
-        # Smax = cv.getTrackbarPos('Smax', 'Masked Image')
-        # Vmax = cv.getTrackbarPos('Vmax', 'Masked Image')
+        Hmin = cv.getTrackbarPos('Hmin', 'Masked Image')
+        Smin = cv.getTrackbarPos('Smin', 'Masked Image')
+        Vmin = cv.getTrackbarPos('Vmin', 'Masked Image')
+        Hmax = cv.getTrackbarPos('Hmax', 'Masked Image')
+        Smax = cv.getTrackbarPos('Smax', 'Masked Image')
+        Vmax = cv.getTrackbarPos('Vmax', 'Masked Image')
 
         # Define range for blue color in HSV
         lower_blue = np.array([Hmin, Smin, Vmin])
@@ -76,15 +79,15 @@ if image is not None and res is not None:
         # Filter the blue region
         # result = cv.bitwise_and(image, image, mask=mask)
 
-        # threshold_min = cv.getTrackbarPos('white_thres', 'White Mask')
+        threshold_min = cv.getTrackbarPos('white_thres', 'White Mask')
 
         white_mask = cv.inRange(hsv, np.array([0, 0, threshold_min]), np.array([180, 255, 255]))
 
         # Show frames
-        # cv.imshow('Masked Image', mask)
-        # cv.imshow('White Mask', white_mask)
+        cv.imshow('Masked Image', mask)
+        cv.imshow('White Mask', white_mask)
 
-        # size = cv.getTrackbarPos('size', 'cleaned')
+        size = cv.getTrackbarPos('size', 'cleaned')
 
         kernel = np.ones((size, size), np.uint8)
         dilated1 = cv.dilate(mask, kernel, iterations=1)
@@ -107,11 +110,11 @@ if image is not None and res is not None:
         cleaned = cv.morphologyEx(combined, cv.MORPH_CLOSE, kernel)
         cleaned = cv.morphologyEx(cleaned, cv.MORPH_OPEN, kernel)
 
-        # cv.imshow('cleaned', cleaned)
+        cv.imshow('cleaned', cleaned)
 
         contours, _ = cv.findContours(cleaned, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
 
-        neato_rad = 0.13 #m
+        neato_rad = 0.17 #m
         neato_rad_pix =  math.ceil(neato_rad / res)
 
         output_vis = image.copy()
@@ -130,8 +133,6 @@ if image is not None and res is not None:
                         cv.circle(output_map, (int(x), int(y)), neato_rad_pix, color=0, thickness=1, lineType=cv.LINE_AA)
                     approx = cv.approxPolyDP(cnt, 0.04 * peri, True)
                     
-                    # If it has 4 corners, it's likely part of your grid
-                    # if len(approx) == 4:
                     cv.drawContours(output_vis, [cnt], -1, (0, 255, 0), 2)
 
         _, output_map = cv.threshold(output_map, 245, 255, cv.THRESH_BINARY)
@@ -139,22 +140,25 @@ if image is not None and res is not None:
         cv.imshow('output', output_vis)
         cv.imshow('output map', output_map) # type: ignore
 
-        cv.imwrite('src/maze_solver/maps/maze.png', output_map)
+        key = cv.waitKey(1) & 0xFF
 
-        yaml_path  = "src/maze_solver/maps/maze.yaml"
-        yaml_data = {
-            'image': 'maze.png',
-            'mode': 'trinary',
-            'resolution': float(res),
-            'origin': [0,0,0],
-            'negate': 0,
-            'occupied_thresh': 0.65,
-            'free_thresh': 0.25
-        }
-
-        with open(yaml_path, "w", encoding="utf-8") as file:
-            safe_dump(yaml_data, file, default_flow_style=False, sort_keys=False)
-
-
-        if cv.waitKey(1) & 0xFF == ord('q'):
+        if  key == ord('q'):
             break
+        elif key == ord('s'):
+            print("saveing")
+            cv.imwrite(f'src/maze_solver/maps/{name}.png', output_map)
+            yaml_path  = f"src/maze_solver/maps/{name}.yaml"
+            yaml_data = {
+                'image': f'{name}.png',
+                'mode': 'trinary',
+                'resolution': float(res),
+                'origin': [0,0,0],
+                'negate': 0,
+                'occupied_thresh': 0.65,
+                'free_thresh': 0.25
+            }
+
+            with open(yaml_path, "w", encoding="utf-8") as file:
+                safe_dump(yaml_data, file, default_flow_style=False, sort_keys=False)
+
+

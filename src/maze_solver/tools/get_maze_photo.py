@@ -75,7 +75,7 @@ def main():
             break
 
         if key == ord('s'):
-            cv2.imwrite(f"src/maze_solver/tools/maze_photo_test.jpg", dst)
+            cv2.imwrite(f"src/maze_solver/tools/photo_maze_mac.jpg", dst)
 
     # When everything is done, release the capture object and close all windows
     cap.release()

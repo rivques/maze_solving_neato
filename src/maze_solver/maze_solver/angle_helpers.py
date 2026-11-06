@@ -1,5 +1,5 @@
 import numpy as np
-from geometry_msgs.msg import Pose, Point, Quaternion
+from geometry_msgs.msg import Pose, Point, Quaternion, Transform
 
 # helper functions
 # from the particle filter assignment
@@ -26,8 +26,10 @@ def quaternion_from_euler(roll, pitch, yaw):
     q[3] = cy * cp * cr + sy * sp * sr
 
     return q
-def pose_to_tuple(pose: Pose):
+def pose_to_tuple(pose: Pose | Transform):
     """ Convert pose (geometry_msgs.Pose) to a (x,y,yaw) tuple """
+    if isinstance(pose, Transform):
+        pose = Pose(position=pose.translation, orientation=pose.rotation)
     orientation_tuple = (pose.orientation.x,
                             pose.orientation.y,
                             pose.orientation.z,

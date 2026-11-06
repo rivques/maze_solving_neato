@@ -86,20 +86,38 @@ def test_plan_trajectory(map: OccupancyGrid, plt):
         map_y = int((p.position.y - map.info.origin.position.y) / map.info.resolution)
         assert (map_x, map_y) not in maze_walls, f"Pose {p} is in a wall at map coordinates {(map_x, map_y)}"
 
-    # for i in range(len(raw_poses)-1):
-    #     # check that the line segment between two consecutive poses does not intersect any walls
-    #     p1 = np.array(raw_poses[i][:2])
-    #     p2 = np.array(raw_poses[i+1][:2])
-    #     for wall in maze_walls:
-    #         wall_pos = np.array([(wall[0] + 0.5) * map.info.resolution + map.info.origin.position.x,
-    #                              (wall[1] + 0.5) * map.info.resolution + map.info.origin.position.y])
-    #         wall_size = np.array([map.info.resolution, map.info.resolution])
-    #         # check if the line segment intersects the wall's bounding box
-    #         intersects_wall = (min(p1[0], p2[0]) <= wall_pos[0] + wall_size[0] and max(p1[0], p2[0]) >= wall_pos[0] and
-    #             min(p1[1], p2[1]) <= wall_pos[1] + wall_size[1] and max(p1[1], p2[1]) >= wall_pos[1])
-    #         if intersects_wall:
-    #             # circle it
-    #             patch = plt.Circle((wall[0], wall[1]), radius=4, color='b', fill=False)
-    #             plt.gca().add_patch(patch)
-    #         assert not intersects_wall, \
-    #             f"Line segment between poses {trajectory[i].position} and {trajectory[i+1].position} intersects wall at map coordinates {wall}"
+def test_get_vels_for_traj(map: OccupancyGrid):
+    start_pose = tuple_to_pose(-0.1, -0.95, np.pi/2)
+    goal_pose = tuple_to_pose(0, 0.9, np.pi/2)
+    trajectory = runner_logic.plan_trajectory(map, start_pose, goal_pose)
+
+    # test a few points along the trajectory
+    for i in range(0, len(trajectory), max(1, len(trajectory)//5)):
+        p = trajectory[i]
+        x_close, y_close, theta_close = pose_to_tuple(p)
+        # nudge the robot a bit off the path
+        x_odom = x_close + 0.05
+        y_odom = y_close - 0.05
+        theta_odom = theta_close + 0.1
+        x_map, y_map, theta_map = 0, 0, 0 # assume odom frame is at the origin of the map frame
+        params = {
+            "target_dist_forward": 0.1,
+            "linear_kp": 1.0,
+            "angular_kp": 1.0,
+        }
+        linear, angular, traj_done, debug_points = runner_logic.get_vels_for_traj(x_odom, y_odom, theta_odom, x_map, y_map, theta_map, trajectory, params)
+        closest_point = debug_points["closest_point"]
+        target_point = debug_points["target_point"]
+        # check that the closest point is indeed close to the robot's position
+        assert np.linalg.norm(np.array(closest_point) - np.array([x_odom, y_odom])) < 0.1, f"Closest point {closest_point} is too far from robot position {(x_odom, y_odom)}"
+
+        # check that the target point is ahead of the closest point along the trajectory
+        closest_index = debug_points["closest_index"]
+        target_index = debug_points["target_index"]
+        assert target_index >= closest_index, f"Target point {target_point} is not ahead of closest point {closest_point} along the trajectory"
+
+        # check that the linear and angular velocities are reasonable
+        assert 0 <= linear <= 0.15, f"Linear velocity {linear} should never be much above 0.1 m/s for linear_kp=1.0 and target_dist_forward=0.1"
+        assert -np.pi <= angular <= np.pi, f"Angular velocity {angular} is out of range [-pi, pi] for angular_kp=1.0"
+
+        # really the best way to test this is an integration test involving launching gazebo, which is out of scope for this unit test

@@ -4,13 +4,14 @@ from april_tag_detect import unwarp_image
 import math
 from yaml import safe_dump
 
-name = "maze_mac"
+name = "maze_mac2"
 
 image_path = f"src/maze_solver/tools/photo_{name}.jpg"
 calibration_path = "src/maze_solver/tools/calibration_data.npz"
 at_size = 0.15875
 
 output = unwarp_image(image_path, calibration_path, at_size, 1000)
+
 if output is not None:
     image, res, im_size = output 
     print(res)
@@ -24,25 +25,25 @@ else:
 
 cv.namedWindow('Masked Image', cv.WINDOW_NORMAL)
 cv.resizeWindow('Masked Image', 1280, 720)
-cv.createTrackbar('Hmin', 'Masked Image', 70, 180, lambda i: None)
-cv.createTrackbar('Smin', 'Masked Image', 36, 255, lambda i: None)
-cv.createTrackbar('Vmin', 'Masked Image', 108, 255, lambda i: None)
-cv.createTrackbar('Hmax', 'Masked Image', 114, 180, lambda i: None)
-cv.createTrackbar('Smax', 'Masked Image', 189, 255, lambda i: None)
-cv.createTrackbar('Vmax', 'Masked Image', 166, 255, lambda i: None)
+cv.createTrackbar('Hmin', 'Masked Image', 61, 180, lambda i: None)
+cv.createTrackbar('Smin', 'Masked Image', 14, 255, lambda i: None)
+cv.createTrackbar('Vmin', 'Masked Image', 149, 255, lambda i: None)
+cv.createTrackbar('Hmax', 'Masked Image', 98, 180, lambda i: None)
+cv.createTrackbar('Smax', 'Masked Image', 28, 255, lambda i: None)
+cv.createTrackbar('Vmax', 'Masked Image', 190, 255, lambda i: None)
 
-Hmin = 70
-Smin = 36
-Vmin = 108
-Hmax = 114
-Smax = 189
-Vmax = 166
+Hmin = 61
+Smin = 14
+Vmin = 149
+Hmax = 98
+Smax = 28
+Vmax = 190
 
 cv.namedWindow('White Mask', cv.WINDOW_NORMAL)
 cv.resizeWindow('White Mask', 1280, 720)
-cv.createTrackbar('white_thres', 'White Mask', 171, 255, lambda i: None)
+cv.createTrackbar('white_thres', 'White Mask', 183, 255, lambda i: None)
 
-threshold_min = 171
+threshold_min = 183
 
 cv.namedWindow('cleaned', cv.WINDOW_NORMAL)
 cv.resizeWindow('cleaned', 1280, 720)
@@ -114,7 +115,7 @@ if image is not None and res is not None:
 
         contours, _ = cv.findContours(cleaned, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
 
-        neato_rad = 0.17 #m
+        neato_rad = 0.2 #m
         neato_rad_pix =  math.ceil(neato_rad / res)
 
         output_vis = image.copy()

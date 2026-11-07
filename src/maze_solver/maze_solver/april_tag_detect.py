@@ -6,7 +6,7 @@ import math
 from numpy.typing import NDArray
 from dt_apriltags import Detector, Detection
 
-def unwarp_image(path, calibration_path, at_size, x_pixles_out):
+def unwarp_image(path, calibration_path, at_size, x_pixles_out, debug=False):
     # image_path = "src/maze_solver/tools/maze_photo_test.jpg"
     image = cv.imread(path)
 
@@ -57,7 +57,9 @@ def unwarp_image(path, calibration_path, at_size, x_pixles_out):
             center = tag.center
             pos = tag.pose_t
             cv.putText(output, f"ID: {tag.tag_id}, Pos: ({pos})", (int(center[0]), int(center[1])), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1) # type: ignore
-        # cv.imshow('output', output)
+        if debug:
+            cv.imshow('output', output)
+            cv.waitKey(0)
 
         wld_pose: NDArray = np.array([tag.pose_t.flatten() for tag in tags]) # type: ignore
         # print(wld_pose)
@@ -131,3 +133,11 @@ def unwarp_image(path, calibration_path, at_size, x_pixles_out):
         # cv.imshow("warped", warped)
         
         # cv.waitKey(0)
+
+if __name__ == "__main__":
+    name = "maze_mac2"
+    image_path = f"src/maze_solver/tools/photo_{name}.jpg"
+    calibration_path = "src/maze_solver/tools/calibration_data.npz"
+    at_size = 0.15875
+
+    unwarp_image(image_path, calibration_path, at_size, 1000, True)

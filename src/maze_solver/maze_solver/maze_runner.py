@@ -27,8 +27,11 @@ class MazeRunnerNode(Node):
         self.initial_pose: Pose | None = None
         self.goal_pose: Pose | None = None
 
+        # these poses come from the rviz tools
         self.initial_pose_sub = self.create_subscription(PoseWithCovarianceStamped, 'initialpose', self.set_initial_pose, 10)
         self.goal_pose_sub = self.create_subscription(PoseStamped, 'goal_pose', self.set_goal_pose, 10)
+
+        # for broadcasting the map->odom transform
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
         self.tf_broadcaster = TransformBroadcaster(self)
@@ -54,11 +57,18 @@ class MazeRunnerNode(Node):
         self.declare_parameter("angular_kp", 1)
 
     def broadcast_tf(self):
+        """
+        just constantly broadcast the map->odom transform so that rviz knows about it
+        """
         if self.tf is not None:
             self.tf.header.stamp = (self.get_clock().now()).to_msg()
             self.tf_broadcaster.sendTransform(self.tf)
 
     def set_initial_pose(self, msg: PoseWithCovarianceStamped):
+        """
+        given an initial pose, set the map->odom transform appropriately
+        also plan a trajectory if we already have a goal pose
+        """
         self.get_logger().info(f"Received initial pose: {msg.pose.pose}")
         self.initial_pose = msg.pose.pose
 
@@ -108,6 +118,9 @@ class MazeRunnerNode(Node):
             self.plan_trajectory()
 
     def set_goal_pose(self, msg: PoseStamped):
+        """
+        store the goal pose given to us by rviz, and plan a trajectory if we already have an initial pose
+        """
         self.get_logger().info(f"Received goal pose: {msg.pose}")
         self.goal_pose = msg.pose
         if self.initial_pose is not None:
@@ -115,6 +128,9 @@ class MazeRunnerNode(Node):
             self.plan_trajectory()
 
     def plan_trajectory(self):
+        """
+        plan a trajectory from the initial pose to the goal pose
+        """
         self.planned_trajectory = plan_trajectory(self.map, self.initial_pose, self.goal_pose) # pyright: ignore[reportArgumentType]
         self.get_logger().info(f"Planned trajectory with {len(self.planned_trajectory)} poses")
         # convert the list of poses to PoseStamped for Path
@@ -124,10 +140,12 @@ class MazeRunnerNode(Node):
         self.planned_path_pub.publish(path_msg)
         
     def odom_callback(self, msg: Odometry):
+        """
+        if we have a planned trajectory, compute the appropriate cmd_vel to follow it
+        """
         if len(self.planned_trajectory) == 0:
             return # no trajectory to follow yet
 
-        # convert odom to map frame using most recent map->odom transform
         if self.tf is None:
             self.get_logger().warn("No map->odom transform available, cannot follow path")
             return
@@ -139,7 +157,8 @@ class MazeRunnerNode(Node):
             "linear_kp": self.get_parameter("linear_kp").value,
             "angular_kp": self.get_parameter("angular_kp").value,
         }
-        
+
+        # logic is broken out into runner_logic.py so that it can be tested independently of a rclpy.Node
         linear, angular, traj_done, debug_points = get_vels_for_traj(x_odom, y_odom, theta_odom, x_map, y_map, theta_map, self.planned_trajectory, traj_params)
 
         # debug publishing
@@ -168,6 +187,7 @@ class MazeRunnerNode(Node):
             self.goal_pose = None
             return
 
+        # if we've gotten this far, we have a linear and angular velocity to publish
         cmd_vel_msg = Twist()
         cmd_vel_msg.linear.x = linear
         cmd_vel_msg.angular.z = angular

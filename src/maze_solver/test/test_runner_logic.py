@@ -11,6 +11,9 @@ from maze_solver.angle_helpers import tuple_to_pose, pose_to_tuple
 # so we'll do this by hand
 @pytest.fixture
 def map() -> OccupancyGrid:
+    """
+    Load an example map from the maps directory and convert it to an OccupancyGrid message.
+    """
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     map_file_path = os.path.join(root_dir, 'maps', 'fake_maze.yaml')
     with open(map_file_path, 'r') as f:

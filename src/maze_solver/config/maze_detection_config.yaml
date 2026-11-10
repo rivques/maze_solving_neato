@@ -1,0 +1,12 @@
+at_size: 0.15875
+H_min: 61
+S_min: 14
+V_min: 149
+H_max: 98
+S_max: 28
+V_max: 190
+threshold_min: 183
+size: 9
+photo_name: "maze_mac2"
+neato_rad: 0.2
+im_x_width: 1000

@@ -1,23 +1,15 @@
 import cv2
 
 def main():
-    # 0 is typically the default built-in webcam or the first connected USB camera.
-    # If using multiple cameras, try changing this index to 1, 2, etc., 
-    # or pass a device path string like "/dev/video0" on Linux.
+    """This file is dedicated to showing a video feed from our camera and allowing us to save frames from it for calibration
+    The core code is loosely based on an answer from google search AI but has since been substantially adapted to our use case"""
     camera_index = "/dev/video4"
     
     # Initialize the video capture object
     cap = cv2.VideoCapture(camera_index)
-    
-    # Optional: Set custom frame width and height
-    # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-    # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
-    # actual_width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-    # actual_height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
-    # print(f"Requested: 1920x1080 | Actual: {actual_width}x{actual_height}")
-
-    
+    # Create a window to display output. 
+    # Without creating the window explicitly it would sometimes be too small and wouldn't resize
     cv2.namedWindow('USB Video Feed', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('USB Video Feed', 1280, 720)
 
@@ -31,10 +23,11 @@ def main():
 
     print("Press 'q' to exit the video feed.")
 
+    # We track home many frames have been recorded for naming
     frame_count = 0
 
     while True:
-        # Capture frame-by-frame
+        # Capture current video frame
         ret, frame = cap.read()
 
         # If the frame was not grabbed successfully, break the loop
@@ -42,15 +35,17 @@ def main():
             print("Error: Failed to grab frame.")
             break
 
-        # Display the resulting frame in a window named 'USB Video Feed'
+        # Display the video
         cv2.imshow('USB Video Feed', frame)
 
+        # delay and wait for key press
         key = cv2.waitKey(1) & 0xFF
 
-        # Wait for 1 millisecond and check if the user pressed the 'q' key
+        # If we pressed q stop
         if key == ord('q'):
             break
 
+        # If we pressed save the current frame to the test_frame directry in tools
         if key == ord('s'):
             cv2.imwrite(f"src/maze_solver/tools/test_frames/calibration_img_{frame_count}.jpg", frame)
             frame_count += 1

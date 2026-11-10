@@ -1,3 +1,6 @@
+"""This code is taken from the demo found here: https://docs.opencv.org/4.13.0/dc/dbb/tutorial_py_calibration.html
+The code has been modified to save our data and be correct for the grid size we are using for testing"""
+
 import numpy as np
 import cv2 as cv
 import glob
@@ -42,6 +45,7 @@ cv.destroyAllWindows()
 
 ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
 
+# We save the calibration data as NP arrays in a .npz file. This file is used by our other image capturing functions
 np.savez("src/maze_solver/tools/calibration_data", matrix = mtx, distortion = dist)
 
 img = cv.imread(images[0])
@@ -56,8 +60,6 @@ else:
 
     # crop the image
     x, y, w, h = roi
-    # print(x, y, w, h)
-    # dst = dst[y:y+h, x:x+w]
     cv.imwrite('src/maze_solver/tools/test_frames/calib_result.png', dst)
 
 mean_error = 0

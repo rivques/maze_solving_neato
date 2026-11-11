@@ -182,9 +182,9 @@ In this section we take the image with a corrected top down perspective and use 
 *Figure 9\. Overview of OpenCV processing steps*
 
 1. Mask for blue pixels  in HSV space  
-   To filter for blue pixels we map the HSV space. We made tools to display trackbar which we can adjust whenever running the program in a new environment  
+   To filter for blue pixels we map the HSV space. We made tools to display trackbar which we can adjust whenever running the program in a new environment. The imaged masked for blue can be seen in Figure 10. 
 2. Mask for white pixels with in HSV space  
-   To mask for white pixels we threshold on all possible values of hue and saturation and only place a lower bound on acceptable value values. The lower bound for value can be set by a trackbar for new environments.  
+   To mask for white pixels we threshold on all possible values of hue and saturation and only place a lower bound on acceptable value values. The lower bound for value can be set by a trackbar for new environments.  The image masked for white can be seen in Figure 10.
 3. Blur each mask  
    Next we blur each mask by convolving a kernel of all 1s over the image. The kernel size can be set by a track bar when adapting the filter to a new environment. This ensures that there will be overlap between the blue regions and the white regions of the blue and white checkered tape.  
 4. Combine the masks  
@@ -196,10 +196,15 @@ In this section we take the image with a corrected top down perspective and use 
 7. Filter contours  
    The contours we find in the image will include some contours that are erroneous. However, these contours tend to be small in area or perimeter, whereas the intended contours are much larger in both. Due to this we can eliminate the erroneous contours by filtering our contours that have a perimeter or area that is too low.
 
-The contours found from this approach can be seen in Figure 10\.
+![](assets/maze_masked_for_blue.jpg)
+*Figure 10. The maze photo masked to select blue pixels*
+![](assets/maze_masked_for_white.jpg)
+*Figure 11. The maze photo masked to select white pixels*
+
+The contours found from this approach can be seen in Figure 11\.
 
 ![](assets/maze_with_contours.jpg) 
-*Figure 10\. Image generated from our program including the contours found by filtering for the blue and white checkered tape.*
+*Figure 11\. Image generated from our program including the contours found by filtering for the blue and white checkered tape.*
 
 We then need to use this contour data to create a map that can be interpreted by a map server.
 
@@ -211,15 +216,15 @@ We then need to use this contour data to create a map that can be interpreted by
    We found that the map produced from this method had some noise due to anti-aliasing. We tried simply turning off anti-aliasing however, that gave us very poor results. To fix this we simply thresholded all that were at a very high value to white and left everything else black. This ensures we get every pixel we might want to include thus increasing our margin of error.  
    
 
-An example of a map produced from this approach can be seen in Figure 11\.  
+An example of a map produced from this approach can be seen in Figure 12\.  
 ![](assets/maze_mac2.png)
-*Figure 11\. Bitmap created by our program based on the contours found previously. We saved our map as a PNG*
+*Figure 12\. Bitmap created by our program based on the contours found previously. We saved our map as a PNG*
 
 ## Navigation
 
-We now have a map of the maze. At this point, we move from using Python scripts into running a ROS node to control the Neato robot. The robot follows the state machine shown in Figure 12\.  
+We now have a map of the maze. At this point, we move from using Python scripts into running a ROS node to control the Neato robot. The robot follows the state machine shown in Figure 13\.  
 ![nav-state-diagram.svg](/assets/nav-state-diagram.svg)  
-*Figure 12\. The state diagram of the navigation system. Initial and goal poses are provided from RViz, end of path is detected when the closest point on the path to the Neato is the final point on the path.*
+*Figure 13\. The state diagram of the navigation system. Initial and goal poses are provided from RViz, end of path is detected when the closest point on the path to the Neato is the final point on the path.*
 
 ### Breadth-First Search
 
@@ -251,14 +256,14 @@ path_nodes.reverse()
 
 This leaves a list of nodes that lead from the start node to the end node in `path_nodes`. The actual implementation of this algorithm lives in [runner\_logic.plan\_trajectory](https://github.com/rivques/maze_solving_neato/blob/main/src/maze_solver/maze_solver/runner_logic.py#L17), and includes a few extra checks and considerations.  
 ![bfs-diagram.svg](/assets/bfs-diagram.svg)
-*Figure 13\. A diagram showing the major steps of breadth-first search pathfinding.*
+*Figure 14\. A diagram showing the major steps of breadth-first search pathfinding.*
 
 ### Pure Pursuit
 
-Now that we have a path, we need to figure out the actual velocity commands to get the Neato to follow that path. To do this, we use an algorithm called Pure Pursuit. The high-level steps of this algorithm are shown in Figure 14\.  
+Now that we have a path, we need to figure out the actual velocity commands to get the Neato to follow that path. To do this, we use an algorithm called Pure Pursuit. The high-level steps of this algorithm are shown in Figure 15\.  
 ![pure-pursuit-flowchart.svg](/assets/pure-pursuit-flowchart.svg)  
 
-*Figure 14\. The important steps in the Pure Pursuit path following algorithm.*
+*Figure 15\. The important steps in the Pure Pursuit path following algorithm.*
 
 This algorithm is simple, though it comes at the expense of not being able to pre-plan velocity and acceleration and having a tendency to cut corners. For our application, this is acceptable, since we don’t particularly care about the velocity of the Neato, as long as it follows the path, and the Neato radius compensation on our maze maps means that we don’t have sharp, cuttable corners at maze walls.
 
@@ -266,10 +271,9 @@ This algorithm is implemented in [runner\_logic.get\_vels\_for\_traj](https://gi
 
 ![pure_pursuit_lookahead1.png](https://www.mathworks.com/help/nav/ug/pure_pursuit_lookahead1.png) 
 
-*Figure 15\. An illustration of how the Pure Pursuit algorithm follows waypoints. [Source](https://www.mathworks.com/help/nav/ug/pure-pursuit-controller.html)*
+*Figure 16\. An illustration of how the Pure Pursuit algorithm follows waypoints. [Source](https://www.mathworks.com/help/nav/ug/pure-pursuit-controller.html)*
 
-Figure 15 shows how the Neato selects a target point along its path. Given this target point, we use simple proportional controllers to drive the Neato towards the target:  
-
+Figure 16 shows how the Neato selects a target point along its path. Given this target point, we use simple proportional controllers to drive the Neato towards the target:  
 $$
 \begin{gather*}
 \vec{V} =  \vec{T}_{/O} - \vec{N}_{/O} \\ 
@@ -281,10 +285,10 @@ v_\theta = kP_{\theta} \cdot \epsilon_{\theta}
 $$
 
 Where $\vec{T}_{/O}$ is the current target point in the odom frame, $\vec{N}_{/O}$ is the Neato’s position in the odom frame, $N_{\theta}$ is the Neato’s yaw angle in the odom frame, $\epsilon_x$ and $\epsilon_{\theta}$ are the linear and angular errors, respectively, and $kP_x$ and $kP_{\theta}$ are the controller’s gains. After testing, we settled on a $kP_x$ and $kP_{\theta}$ of 0.5 m/s/m and 1 rad/s/rad, respectively, as well as a lookahead distance of 20cm. These parameters are tunable with the ROS Param system.
-Figure 16 provides an example of what this looks like to the robot in practice: a path is generated, and the Neato proceeds to chase a point along the path.
+Figure 17 provides an example of what this looks like to the robot in practice: a path is generated, and the Neato proceeds to chase a point along the path.
 
 ![path-following-rviz.gif](assets/path-following-rviz.gif)
-*Figure 16\. An animation of the path planning and following algorithms running. Green is the planned path, red is the actual travelled path, and the small dots moving along the path are the closest point and current target point. The Neato is represented by the axes.*
+*Figure 17\. An animation of the path planning and following algorithms running. Green is the planned path, red is the actual travelled path, and the small dots moving along the path are the closest point and current target point. The Neato is represented by the axes.*
 
 # Important design decisions
 
@@ -406,7 +410,7 @@ Using AprilTags to define an arbitrary 2D plane in the 3D space captured by a ca
 
 The idea of having an overlooking camera relay navigation information to a rover on the ground shows up across robotics. Perhaps the most famous example of this pattern is the Mars rover Perseverance and its helicopter Ingenuity. Ingenuity, over its 66 operational flights, scanned terrain ahead of Perseverance from the air. This allowed the rover to better understand the obstacles ahead of it and navigate more efficiently. While more advanced algorithms for obstacle recognition and pathfinding were used than what we demonstrate here, the concept is the same.  
 ![ingenuity-any-perseverance](https://www.nasa.gov/wp-content/uploads/2020/07/pia23963-1041.jpg)  
-*Figure 17\. The Ingenuity Mars helicopter scouts ahead of the Perseverance rover (artist’s impression). [Source](https://www.nasa.gov/solar-system/6-things-to-know-about-nasas-ingenuity-mars-helicopter/)*
+*Figure 18\. The Ingenuity Mars helicopter scouts ahead of the Perseverance rover (artist’s impression). [Source](https://www.nasa.gov/solar-system/6-things-to-know-about-nasas-ingenuity-mars-helicopter/)*
 
 # How to run
 

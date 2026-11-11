@@ -67,17 +67,17 @@ The next step in the vision pipeline is to use the four AprilTags in the saved m
 
    Where X, Y, Z are column vectors containing the position of each AprilTag
    
-    $$
-    \mathbf A = \begin{bmatrix}  \mathbf{1} & \mathbf{X} & \mathbf{Y} \end  {bmatrix} \\
-    $$
+$$
+\mathbf A = \begin{bmatrix}  \mathbf{1} & \mathbf{X} & \mathbf{Y} \end  {bmatrix} \\
+$$
 
     Equation 1.
 
    In Equation 1 we define A where **1** is an appropriately sized column vector of ones. Then we solve Equation 2 to get a least squares solve for C where C has the form $C=[a,b,c]'$ where $z=a+bx+cy$
 
-    $$
-    \mathbf Z = \mathbf A \mathbf C
-    $$
+$$
+\mathbf Z = \mathbf A \mathbf C
+$$
 
     Equation 2.
 
@@ -85,12 +85,12 @@ The next step in the vision pipeline is to use the four AprilTags in the saved m
 
    In Equation 3.1 and 3.2, we define two basis vectors locked to the x and y axis within the calculated plane.
 
-    $$
-    \begin{align}
-    x_{basis} = \begin{bmatrix} \frac{1}{\sqrt{1+b^2}} \cr 0 \cr \frac{b}{\sqrt{1+b^2}} \end{bmatrix} \qquad (1) \\
-    y_{basis} = \begin{bmatrix} 0 \cr \frac{1}{\sqrt{1+c^2}} \cr \frac{c}{\sqrt{1+c^2}} \end{bmatrix} \qquad (2) 
-    \end{align}
-    $$
+$$
+\begin{align}
+x_{basis} = \begin{bmatrix} \frac{1}{\sqrt{1+b^2}} \cr 0 \cr \frac{b}{\sqrt{1+b^2}} \end{bmatrix} \qquad (1) \\
+y_{basis} = \begin{bmatrix} 0 \cr \frac{1}{\sqrt{1+c^2}} \cr \frac{c}{\sqrt{1+c^2}} \end{bmatrix} \qquad (2) 
+\end{align}
+$$
 
     Equation 3.
 
@@ -100,20 +100,20 @@ The next step in the vision pipeline is to use the four AprilTags in the saved m
 
    For the purposes of calculations we define the matrix P to contain each AprilTags location as a column vector as shown in Equation 4\.
 
-    $$
-    \mathbf P = \begin{bmatrix}  \mathbf{X'} \cr \mathbf{Y'} \cr \bf{Z'} \end{bmatrix}
-    $$
+$$
+\mathbf P = \begin{bmatrix}  \mathbf{X'} \cr \mathbf{Y'} \cr \bf{Z'} \end{bmatrix}
+$$
 
     Equation 4.
 
    We find the "coefficient” for how far in the x and y direction each point is by taking the dot product of each basis and **P**. In Equation 5.1 and 5.2 we define to ${x}_{coeffs}$ and ${y}_{coeffs}$ as the list of these coefficients
 
-    $$
-    \begin{align}
-    \mathbf {x}_{coeffs} = \mathbf{x}_{basis}'\mathbf{P} \qquad (1) \\
-    \mathbf {y}_{coeffs} = \mathbf{y}_{basis}'\mathbf{P} \qquad (2)
-    \end{align}
-    $$
+$$
+\begin{align}
+\mathbf {x}_{coeffs} = \mathbf{x}_{basis}'\mathbf{P} \qquad (1) \\
+\mathbf {y}_{coeffs} = \mathbf{y}_{basis}'\mathbf{P} \qquad (2)
+\end{align}
+$$
 
     Equation 5.
 
@@ -125,12 +125,12 @@ The next step in the vision pipeline is to use the four AprilTags in the saved m
 
    We can find the difference in coefficients in the x and y direction by taking $max-min$ for each one. To find the actual in meters range within the plane we project this difference back into our plane by multiplying the basis vectors by their respective range and finally taking the Euclidean norm. This is shown in Equations 6.1 and 6.2
 
-    $$
-    \begin{align}
-    \mathbf{x}_{range} = \mathrm{norm} (\mathbf{x}_{basis}(x_{max,c} - x_{min,c})) \qquad (1) \\
-    \mathbf{y}_{range} = \mathrm{norm} (\mathbf{y}_{basis}(y_{max,c} - y_{min,c})) \qquad (2)
-    \end{align}
-    $$
+$$
+\begin{align}
+\mathbf{x}_{range} = \mathrm{norm} (\mathbf{x}_{basis}(x_{max,c} - x_{min,c})) \qquad (1) \\
+\mathbf{y}_{range} = \mathrm{norm} (\mathbf{y}_{basis}(y_{max,c} - y_{min,c})) \qquad (2)
+\end{align}
+$$
 
     Equation 6.
 
@@ -138,9 +138,9 @@ The next step in the vision pipeline is to use the four AprilTags in the saved m
 
    The number of pixels on the x (horizontal) axis is defined as a parameter to the function. We calculate the y size of the output image such that the relative distances in the world and the result image are the same. That means the ratios ${x}_{pixels}\ /\ {y}_{pixels}\ =\ {x}_{range}\ /{y}_{range}$ must be equal. We define $\ {y}_{pixels}$ so that is the case in Equation 7
 
-    $$
-    y_{pixels} = x_{pixels} * (y_{range} / x_{range}) 
-    $$
+$$
+y_{pixels} = x_{pixels} * (y_{range} / x_{range}) 
+$$
 
     Equation 7.
 
@@ -149,12 +149,13 @@ The next step in the vision pipeline is to use the four AprilTags in the saved m
    To find where each april tag should appear in our new image where its x and y coefficients fall proportionally between our min and max coefficients on each axis then rescale this fraction to be of our pixel range. These new values are calculated as shown in Equation 8.1 and 8.2. Because we previously set the ratios of sizes in the world equal to the ratio of sizes in pixel ranges.  
 
 
-    $$
-    \begin{align}
-    AT_x = ( \mathbf {x}_{coeffs} - x_{min,c} ) / (x_{max,c} - x_{min,c}) x_{pixels} \qquad (1) \\
-    AT_y = ( \mathbf {y}_{coeffs} - y_{min,c} ) / (y_{max,c} - y_{min,c}) y_{pixels} \qquad (2)
-    \end{align}
-    $$
+$$
+\begin{align}
+AT_x = ( \mathbf {x}_{coeffs} - x_{min,c} ) / (x_{max,c} - x_{min,c}) x_{pixels} \qquad (1) \\
+AT_y = ( \mathbf {y}_{coeffs} - y_{min,c} ) / (y_{max,c} - y_{min,c}) y_{pixels} \qquad (2)
+\end{align}
+$$
+
    Equation 8.
 
     8. Reformat as destination points for open CV
@@ -268,6 +269,7 @@ This algorithm is implemented in [runner\_logic.get\_vels\_for\_traj](https://gi
 *Figure 15\. An illustration of how the Pure Pursuit algorithm follows waypoints. [Source](https://www.mathworks.com/help/nav/ug/pure-pursuit-controller.html)*
 
 Figure 15 shows how the Neato selects a target point along its path. Given this target point, we use simple proportional controllers to drive the Neato towards the target:  
+
 $$
 \begin{gather*}
 \vec{V} =  \vec{T}_{/O} - \vec{N}_{/O} \\ 

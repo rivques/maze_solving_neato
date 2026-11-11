@@ -119,7 +119,7 @@ Equation 5.
 
    4. Find x and y min and max coefficients
 
-   Next we define ${x}_{max,\ c},\ {x}_{min,\ c},\ {y}_{max,\ c},\ {y}_{min,\ c}$ as the maximum and minimum values of ${x}_{coeffs}{\ }$and ${y}_{coeffs}$ respectively.
+   Next we define ${x}_{max,c}, {x}_{min,c}, {y}_{max, c}, {y}_{min, c}$ as the maximum and minimum values of ${x}_{coeffs}$ and ${y}_{coeffs}$ respectively.
 
    5. Find the range (in meters) within the plane in the x and y basis direction
 
